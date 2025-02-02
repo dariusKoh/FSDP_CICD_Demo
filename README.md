@@ -1,6 +1,7 @@
 # FSDP_CICD_Demo
 
 Demo Repo to show CI, utilising Git Hooks to call the app
+Mani Repo : [https://github.com/dariusKoh/FSDP_Group4](https://github.com/dariusKoh/FSDP_Group4)
 
 ## Testing CI
 

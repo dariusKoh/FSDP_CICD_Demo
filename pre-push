@@ -1,0 +1,39 @@
+#!/bin/sh
+
+# An example hook script to verify what is about to be pushed.  Called by "git
+# push" after it has checked the remote status, but before anything has been
+# pushed.  If this script exits with a non-zero status nothing will be pushed.
+#
+# This hook is called with the following parameters:
+#
+# $1 -- Name of the remote to which the push is being done
+# $2 -- URL to which the push is being done
+#
+# If pushing without using a named remote those arguments will be equal.
+#
+# Information about the commits which are being pushed is supplied as lines to
+# the standard input in the form:
+#
+#   <local ref> <local oid> <remote ref> <remote oid>
+#
+# This sample shows how to prevent push of commits where the log message starts
+# with "WIP" (work in progress).
+
+# Pre-push script executed during Git push operation.
+remote="$1"
+url="$2"
+
+echo "pre-push executed, running tests."
+
+# Extract the branch name and commit hash
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+COMMIT=$(git rev-parse HEAD)
+
+# Notify the testing app via webhook (trigger the tests to run)
+echo "Triggering webhook for branch: $BRANCH, commit: $COMMIT"
+curl -f -X POST -H "Content-Type: application/json" \
+	-d '{"branch": "'$BRANCH'", "commit": "'$COMMIT'"}' \
+	http://localhost:3001/webhook || exit 1  # Exit if the webhook request fails
+
+echo "Tests triggered successfully."
+exit 0
